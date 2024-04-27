@@ -12,17 +12,17 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'GSM Module',
       theme: ThemeData.dark(),
-      home: const MyHomePage(title: 'Home Page', titleColor: 0xFF00497D), 
+      home: const MyHomePage(title: 'Home Page', titleColor: 0xFF00497D),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title, required this.titleColor})
-      : super(key: key); 
+      : super(key: key);
 
   final String title;
-  final int titleColor; 
+  final int titleColor;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -32,6 +32,22 @@ class _MyHomePageState extends State<MyHomePage> {
   int ledOn = 0;
   int fanOn = 0;
   int heaterOn = 0;
+  bool isEditing = true;
+  late TextEditingController _textFieldController;
+  Color textColor = const Color(0xFF00497D);
+  late String savedText; 
+
+  @override
+  void initState() {
+    super.initState();
+    _textFieldController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _textFieldController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +67,65 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        controller: _textFieldController,
+                        maxLength: 11,
+                        decoration: InputDecoration(
+                          hintText: 'Enter Number Here',
+                          hintStyle: TextStyle(color: textColor),
+                          filled: true,
+                          fillColor: isEditing ? const Color(0xFFD3E6FF) : Colors.transparent,
+                          border: isEditing ? OutlineInputBorder() : InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5), 
+                        ),
+                        style: TextStyle(color: textColor),
+                        enabled: isEditing,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        isEditing = false; 
+                        textColor = const Color(0xFFD3E6FF); 
+                      });
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFFD3E6FF)),  
+                    ),
+                    child: Text(
+                      'Save',
+                      style: TextStyle(
+                        color: const Color(0xFF00497D), 
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        isEditing = true; 
+                        textColor = const Color(0xFF00497D);
+                        savedText = _textFieldController.text; 
+                      });
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFFD3E6FF)), 
+                    ),
+                    child: Text(
+                      'Change',
+                      style: TextStyle(
+                        color: const Color(0xFF00497D), 
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -249,7 +324,47 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  // Function to show popup
+  Widget _buildButton(String label, int status, VoidCallback onPressed) {
+    return Column(
+      children: [
+        Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            color: status == 1 ? const Color(0xFFB6F2AF) : const Color.fromARGB(255, 219, 86, 86),
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: IconButton(
+            onPressed: onPressed,
+            icon: Icon(
+              status == 1 ? Icons.lightbulb : Icons.lightbulb_outline,
+              color: status == 1 ? const Color(0xFF386238) : Colors.white,
+              size: 30,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          width: 150,
+          height: 50,
+          decoration: BoxDecoration(
+            color: status == 1 ? const Color(0xFFB6F2AF) : const Color.fromARGB(255, 219, 86, 86),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: TextButton(
+            onPressed: onPressed,
+            child: Text(
+              status == 1 ? 'On' : 'Off',
+              style: TextStyle(
+                color: status == 1 ? const Color(0xFF386238) : Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   void _showPopup(String device, String action) {
     showDialog(
       context: context,
