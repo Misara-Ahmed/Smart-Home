@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:telephony/telephony.dart';
+//import 'dart:async';
 
 void main() {
   runApp(const MyApp());
@@ -41,12 +42,22 @@ class _MyHomePageState extends State<MyHomePage> {
   String phoneNumber = "";
   String password = "";
   bool canSend = false;
+  String _feedbackMessage = "";
 
   @override
-  void initState() {
+  void initState()
+  {
     super.initState();
     _mobilePhoneController = TextEditingController();
     _passwordController = TextEditingController();
+    telephony.listenIncomingSms(
+        onNewMessage: onMessage, listenInBackground: false);
+  }
+
+  onMessage(SmsMessage message) async {
+    setState(() {
+      _feedbackMessage = message.body ?? "Error reading message body.";
+    });
   }
 
   @override
@@ -67,8 +78,8 @@ class _MyHomePageState extends State<MyHomePage> {
           style: TextStyle(color: Color(widget.titleColor)),
         ),
       ),
-      body:SingleChildScrollView(
-        child:Container(
+      body: SingleChildScrollView(
+        child: Container(
           decoration: BoxDecoration(
             color: const Color(0xFF00497D),
           ),
@@ -110,8 +121,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             border: isEditing
                                 ? OutlineInputBorder()
                                 : InputBorder.none,
-                            contentPadding:
-                                EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 5),
                           ),
                           style: TextStyle(color: textColor),
                           enabled: isEditing,
@@ -152,8 +163,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             border: isEditing
                                 ? OutlineInputBorder()
                                 : InputBorder.none,
-                            contentPadding:
-                                EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 5),
                           ),
                           style: TextStyle(color: textColor),
                           enabled: isEditing,
@@ -175,21 +186,17 @@ class _MyHomePageState extends State<MyHomePage> {
                             phoneNumber = _mobilePhoneController.text;
                             password = _passwordController.text;
                           });
-                          if (phoneNumber.length < 11)
-                          {
-                            _showPopup(
-                                'Mobile Phone', 'Mobile phone must be 11 number');
+                          if (phoneNumber.length < 11) {
+                            _showPopup('Mobile Phone',
+                                'Mobile phone must be 11 number');
                             phoneNumber = "";
                             canSend = false;
-                          }
-                          else if (password.length < 5)
-                          {
-                            _showPopup('Password', 'Password must be 5 characters');
+                          } else if (password.length < 5) {
+                            _showPopup(
+                                'Password', 'Password must be 5 characters');
                             password = "";
                             canSend = false;
-                          }
-                          else
-                          {
+                          } else {
                             canSend = true;
                           }
                         },
@@ -233,14 +240,22 @@ class _MyHomePageState extends State<MyHomePage> {
                                       to: phoneNumber,
                                       message: '@' + password + '/1',
                                     );
-                                    _showPopup('Light Bulb', 'Turned On');
+                                    Future.delayed(Duration(seconds: 60), ()
+                                    { 
+                                        _showPopup('LED State', '$_feedbackMessage');
+                                    });
+
+                                    //_showPopup('LED State', '$_feedbackMessage');
                                   } else {
                                     telephony.sendSms(
                                       to: phoneNumber,
                                       message: '@' + password + '/0',
                                     );
-
-                                    _showPopup('Light Bulb', 'Turned Off');
+                                    Future.delayed(Duration(seconds: 60), ()
+                                    { 
+                                        _showPopup('LED State', '$_feedbackMessage');
+                                    });
+                                    //_showPopup('LED State', '$_feedbackMessage');
                                   }
                                 });
                               } else {
@@ -280,14 +295,21 @@ class _MyHomePageState extends State<MyHomePage> {
                                       to: phoneNumber,
                                       message: '@' + password + '/1',
                                     );
-
-                                    _showPopup('Light Bulb', 'Turned On');
+                                    Future.delayed(Duration(seconds: 60), ()
+                                    { 
+                                        _showPopup('LED State', '$_feedbackMessage');
+                                    });
+                                    //_showPopup('LED State', '$_feedbackMessage');
                                   } else {
                                     telephony.sendSms(
                                       to: phoneNumber,
                                       message: '@' + password + '/0',
                                     );
-                                    _showPopup('Light Bulb', 'Turned Off');
+                                    Future.delayed(Duration(seconds: 30), ()
+                                    { 
+                                        _showPopup('LED State', '$_feedbackMessage');
+                                    });
+                                    //_showPopup('LED State', '$_feedbackMessage');
                                   }
                                 });
                               } else {
@@ -335,13 +357,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                       to: phoneNumber,
                                       message: '@' + password + '/3',
                                     );
-                                    _showPopup('Fan', 'Turned On');
+                                    _showPopup('Fan State', '$_feedbackMessage');
                                   } else {
                                     telephony.sendSms(
                                       to: phoneNumber,
                                       message: '@' + password + '/2',
                                     );
-                                    _showPopup('Fan', 'Turned Off');
+                                    _showPopup('Fan State', '$_feedbackMessage');
                                   }
                                 });
                               } else {
@@ -350,7 +372,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               }
                             },
                             icon: Icon(
-                              fanOn == 1 ? Icons.ac_unit : Icons.ac_unit_outlined,
+                              fanOn == 1
+                                  ? Icons.ac_unit
+                                  : Icons.ac_unit_outlined,
                               color: fanOn == 1
                                   ? const Color(0xFF386238)
                                   : Colors.white,
@@ -379,13 +403,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                       to: phoneNumber,
                                       message: '@' + password + '/3',
                                     );
-                                    _showPopup('Fan', 'Turned On');
+                                    _showPopup('Fan State', '$_feedbackMessage');
                                   } else {
                                     telephony.sendSms(
                                       to: phoneNumber,
                                       message: '@' + password + '/2',
                                     );
-                                    _showPopup('Fan', 'Turned Off');
+                                    _showPopup('Fan State', '$_feedbackMessage');
                                   }
                                 });
                               } else {
@@ -433,13 +457,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                       to: phoneNumber,
                                       message: '@' + password + '/5',
                                     );
-                                    _showPopup('Heater', 'Turned On');
+                                    _showPopup('Heater State', '$_feedbackMessage');
                                   } else {
                                     telephony.sendSms(
                                       to: phoneNumber,
                                       message: '@' + password + '/4',
                                     );
-                                    _showPopup('Heater', 'Turned Off');
+                                    _showPopup('Heater State', '$_feedbackMessage');
                                   }
                                 });
                               } else {
@@ -479,13 +503,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                       to: phoneNumber,
                                       message: '@' + password + '/5',
                                     );
-                                    _showPopup('Heater', 'Turned On');
+                                    _showPopup('Heater State', '$_feedbackMessage');
                                   } else {
                                     telephony.sendSms(
                                       to: phoneNumber,
                                       message: '@' + password + '/4',
                                     );
-                                    _showPopup('Heater', 'Turned Off');
+                                    _showPopup('Heater State', '$_feedbackMessage');
                                   }
                                 });
                               } else {
