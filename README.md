@@ -1,4 +1,23 @@
-# Demo:
+# Smart Home :house:
+This project involves a smart home system used to control multiple utilities using a mobile application. :iphone:
+> **Hardware Used**: GSM SIM808 Module, Heater, Fan, Led.
+
+> **Software Ussed**: Flutter (Dart), Arduino C/C++.
+
+<hr>
+
+# Project Info
+> **Course**: IOT
+
+> **Year**: 4th Year
+
+> **Semester**: 2nd Semester
+
+> **Date**: 2024
+
+<hr>
+
+# Screenshots:
 ![1](https://github.com/user-attachments/assets/1a2b6581-acb7-49fd-b799-20266b68cb6b)
 ![2](https://github.com/user-attachments/assets/4689ba6b-d94d-4665-8285-fc56cf29bdb8)
 ![3](https://github.com/user-attachments/assets/4201815a-4756-4137-9e6b-56d64c2ce169)
